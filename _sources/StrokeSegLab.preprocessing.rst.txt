@@ -1,0 +1,45 @@
+StrokeSegLab.preprocessing package
+==================================
+
+Submodules
+----------
+
+StrokeSegLab.preprocessing.brain\_extraction module
+---------------------------------------------------
+
+.. automodule:: StrokeSegLab.preprocessing.brain_extraction
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.preprocessing.preprocessor module
+----------------------------------------------
+
+.. automodule:: StrokeSegLab.preprocessing.preprocessor
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.preprocessing.resampling module
+--------------------------------------------
+
+.. automodule:: StrokeSegLab.preprocessing.resampling
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.preprocessing.utils module
+---------------------------------------
+
+.. automodule:: StrokeSegLab.preprocessing.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.preprocessing
+   :members:
+   :show-inheritance:
+   :undoc-members:

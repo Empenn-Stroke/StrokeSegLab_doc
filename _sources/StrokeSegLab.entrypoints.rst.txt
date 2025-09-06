@@ -1,0 +1,29 @@
+StrokeSegLab.entrypoints package
+================================
+
+Submodules
+----------
+
+StrokeSegLab.entrypoints.cli module
+-----------------------------------
+
+.. automodule:: StrokeSegLab.entrypoints.cli
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.entrypoints.gui module
+-----------------------------------
+
+.. automodule:: StrokeSegLab.entrypoints.gui
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.entrypoints
+   :members:
+   :show-inheritance:
+   :undoc-members:

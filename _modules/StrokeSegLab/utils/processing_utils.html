@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrokeSegLab.utils.processing_utils &mdash; StrokeSeg 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            StrokeSeg
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../StrokeSegLab.html">StrokeSegLab package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">StrokeSeg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">StrokeSegLab.utils.processing_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for StrokeSegLab.utils.processing_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.naming</span><span class="w"> </span><span class="kn">import</span> <span class="n">DERIVATIVES</span><span class="p">,</span> <span class="n">EXTENSIONS</span><span class="p">,</span> <span class="n">RAWDATA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.option_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Option</span>
+
+
+<div class="viewcode-block" id="get_image_basename">
+<a class="viewcode-back" href="../../../StrokeSegLab.utils.html#StrokeSegLab.utils.processing_utils.get_image_basename">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_image_basename</span><span class="p">(</span><span class="n">img_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the basename without the extension of an image path</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_path (str): Image path</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Basename without the extension</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">EXTENSIONS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">ext</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="move_to_output">
+<a class="viewcode-back" href="../../../StrokeSegLab.utils.html#StrokeSegLab.utils.processing_utils.move_to_output">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">move_to_output</span><span class="p">(</span><span class="n">img_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Copy an image file to the correct output directory</span>
+<span class="sd">    Handle BIDS and not BIDS input directory, and also file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_path (str): Path of the image to copy</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Path of the copy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">option</span> <span class="o">=</span> <span class="n">Option</span><span class="p">()</span>
+    <span class="n">subject_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">input_path</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input_path&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_file&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">RAWDATA</span> <span class="ow">in</span> <span class="n">input_path</span> <span class="p">:</span>
+            <span class="n">raw_dir</span> <span class="o">=</span> <span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">RAWDATA</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># If input is a file in a BIDS directory, it finds the derivatives directory</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_dir</span><span class="p">,</span><span class="n">DERIVATIVES</span><span class="p">,</span><span class="n">subject_name</span><span class="p">,</span><span class="s2">&quot;anat&quot;</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="c1"># If input isn&#39;t in a BIDS directory, the copy will be placed in the parent directory of the input file</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span><span class="n">DERIVATIVES</span><span class="p">,</span><span class="n">subject_name</span><span class="p">,</span><span class="s2">&quot;anat&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">img_path</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="rm_entity">
+<a class="viewcode-back" href="../../../StrokeSegLab.utils.html#StrokeSegLab.utils.processing_utils.rm_entity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rm_entity</span><span class="p">(</span><span class="n">img_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">keyword</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes a BIDS entity from the image filename</span>
+<span class="sd">    The function returns the base filename without the extension and removes the part starting from the entity linked to the keyword (rm_entity(&#39;pahtto/sub-0001_acq-T1w.ext&#39;) -&gt; sub-0001)</span>
+<span class="sd">    Args:</span>
+<span class="sd">        img_path (str): Image path</span>
+<span class="sd">        keyword (str): Entity keyword to remove</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Basename without extension and the entity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">get_image_basename</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="c1"># We only keep the string up to the keyword</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span> <span class="c1"># Handle the case where the entity is _type-keyword, remove after &#39;_&#39;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="c1"># Remove the last &#39;_&#39;</span>
+    <span class="k">return</span> <span class="n">name</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yann Kerverdo, Florent Leray, Youwan Mahé.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

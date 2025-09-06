@@ -1,0 +1,29 @@
+StrokeSegLab.postprocessing package
+===================================
+
+Submodules
+----------
+
+StrokeSegLab.postprocessing.postprocessor module
+------------------------------------------------
+
+.. automodule:: StrokeSegLab.postprocessing.postprocessor
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.postprocessing.viewer module
+-----------------------------------------
+
+.. automodule:: StrokeSegLab.postprocessing.viewer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.postprocessing
+   :members:
+   :show-inheritance:
+   :undoc-members:

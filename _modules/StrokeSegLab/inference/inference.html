@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrokeSegLab.inference.inference &mdash; StrokeSeg 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            StrokeSeg
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../StrokeSegLab.html">StrokeSegLab package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">StrokeSeg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">StrokeSegLab.inference.inference</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for StrokeSegLab.inference.inference</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">onnxruntime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ort</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.models_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.option_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Option</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_filter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_DIR</span>
+
+<div class="viewcode-block" id="Inference">
+<a class="viewcode-back" href="../../../StrokeSegLab.inference.html#StrokeSegLab.inference.inference.Inference">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Inference</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class performs inference on 3D images using an ONNX model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the inference:</span>
+<span class="sd">        - Setup de Config and Option class</span>
+<span class="sd">        - Call for update_models to update the models list</span>
+<span class="sd">        - Preload CUDA DLLs to avoid runtime errors when using the CUDAExecutionProvider</span>
+<span class="sd">        Args:</span>
+<span class="sd">            gui (GUIMain, optional): _description_. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">Option</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;CUDAExecutionProvider&quot;</span><span class="p">:</span>
+            <span class="n">ort</span><span class="o">.</span><span class="n">preload_dlls</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_path&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">update_models</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="mi">128</span><span class="p">]</span>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">image_size</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">],</span> <span class="n">patch_size</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">step_size</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the coordinates of starting positions for the inference</span>
+<span class="sd">        Args:</span>
+<span class="sd">            image_size (tuple[int,int,int]): Size of the image</span>
+<span class="sd">            patch_size (list[int]): Size of the patch to extract</span>
+<span class="sd">            step_size (float, optional): Controls the overlap between consecutive patches. Defaults to 0.5</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[list[int]]: A list of three lists, each containing the start positions for the sliding window in the x, y, and z dimensions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="p">[</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">)],</span> <span class="s2">&quot;image size must be as large or larger than patch_size&quot;</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">step_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;step_size must be larger than 0 and smaller or equal to 1&#39;</span>
+
+        <span class="c1"># our step width is patch_size*step_size at most, but can be narrower. For example if we have image size of</span>
+        <span class="c1"># 110, patch size of 64 and step_size of 0.5, then we want to make 3 steps starting at coordinate 0, 23, 46</span>
+        <span class="n">target_step_sizes_in_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">step_size</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">patch_size</span><span class="p">]</span>
+
+        <span class="n">num_steps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="n">j</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">target_step_sizes_in_voxels</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">)]</span>
+
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">patch_size</span><span class="p">)):</span>
+            <span class="c1"># the highest step value for this dimension is</span>
+            <span class="n">max_step_value</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">-</span> <span class="n">patch_size</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">num_steps</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">actual_step_size</span> <span class="o">=</span> <span class="n">max_step_value</span> <span class="o">/</span> <span class="p">(</span><span class="n">num_steps</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">actual_step_size</span> <span class="o">=</span> <span class="mi">99999999999</span>  <span class="c1"># does not matter because there is only one step at 0</span>
+
+            <span class="n">steps_here</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">actual_step_size</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">[</span><span class="n">dim</span><span class="p">])]</span>
+
+            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">steps_here</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">steps</span>
+     
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_gaussian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patch_size</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">sigma_scale</span> <span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span> <span class="n">value_scaling_factor</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute a centered Gaussian importance map for a patch size</span>
+<span class="sd">        Args:</span>
+<span class="sd">            patch_size (list[int]): Dimensions of the patch</span>
+<span class="sd">            dtype (_type_, optional): Data type of the resulting map. Defaults to np.float32</span>
+<span class="sd">            sigma_scale (float, optional): Scale factor for the standard deviation of the Gaussian. Defaults to 1./8</span>
+<span class="sd">            value_scaling_factor (float, optional): Value used to normalize the max of the map. Defaults to 10.0</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Gaussian importance map</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">patch_size</span><span class="p">)</span>
+        <span class="n">center_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">patch_size</span><span class="p">]</span>
+        <span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">sigma_scale</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">patch_size</span><span class="p">]</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center_coords</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">gaussian_importance_map</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">cval</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">gaussian_importance_map</span> <span class="o">=</span> <span class="n">gaussian_importance_map</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">gaussian_importance_map</span> <span class="o">/=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">gaussian_importance_map</span><span class="p">)</span> <span class="o">/</span> <span class="n">value_scaling_factor</span><span class="p">)</span>
+        
+        <span class="c1"># gaussian_importance_map cannot be 0, otherwise we may end up with nans!</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">gaussian_importance_map</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">gaussian_importance_map</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">gaussian_importance_map</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gaussian_importance_map</span>
+
+<div class="viewcode-block" id="Inference.run">
+<a class="viewcode-back" href="../../../StrokeSegLab.inference.html#StrokeSegLab.inference.inference.Inference.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the inference on a 4D input using a ONNX model</span>
+<span class="sd">        Args:</span>
+<span class="sd">            data (np.ndarray): Input 4D volume. Shape : (1, x, y, z) for one channel model and (2, x, y, z) for T1/FLAIR model</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Output prediction volume. Shape : (b, c, x, y, z), b : batch size, c : output class (2 = background and lesion)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected 4D input (c, x, y, z), got </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span> 
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_DIR</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">.onnx&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Set up ONNX Runtime providers based on device</span>
+        <span class="n">providers</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span> <span class="o">=</span> <span class="n">ort</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span> <span class="n">providers</span><span class="o">=</span><span class="n">providers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ONNX model loaded successfully.&quot;</span><span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_steps</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">)</span>
+        <span class="n">gaussian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_gaussian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">)</span>
+        <span class="n">total_patches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        <span class="n">normalization_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">last_time</span> <span class="o">=</span> <span class="n">start_time</span>
+        
+        <span class="c1"># Get ONNX model input name</span>
+        <span class="n">input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">input_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+        
+        <span class="k">for</span> <span class="n">x_coord</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">y_coord</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">z_coord</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">count</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">check_stop</span><span class="p">():</span>
+                        <span class="k">raise</span> <span class="ne">InterruptedError</span><span class="p">(</span><span class="s2">&quot;Action was cancelled by the user.&quot;</span><span class="p">)</span>
+                    <span class="n">patch</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="n">x_coord</span><span class="p">:</span><span class="n">x_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">y_coord</span><span class="p">:</span><span class="n">y_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">z_coord</span><span class="p">:</span><span class="n">z_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;tensor(float16)&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;using float16 model&quot;</span><span class="p">)</span>
+                        <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">patch</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="p">:</span> 
+                        <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">patch</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+                    
+                    <span class="c1"># Run ONNX inference</span>
+                    <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ort_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="n">input_name</span><span class="p">:</span> <span class="n">patch</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span> <span class="o">*</span> <span class="n">gaussian</span>
+                    
+                    <span class="n">output</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">x_coord</span><span class="p">:</span><span class="n">x_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_coord</span><span class="p">:</span><span class="n">y_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z_coord</span><span class="p">:</span><span class="n">z_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">pred</span>
+                    <span class="n">normalization_map</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">x_coord</span><span class="p">:</span><span class="n">x_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_coord</span><span class="p">:</span><span class="n">y_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z_coord</span><span class="p">:</span><span class="n">z_coord</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">gaussian</span>
+                    
+                    <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="n">total_elapsed</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">start_time</span>
+                    <span class="n">iter_time</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">last_time</span>
+                    <span class="n">remaining</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_elapsed</span> <span class="o">/</span> <span class="n">count</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">total_patches</span> <span class="o">-</span> <span class="n">count</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patch </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_patches</span><span class="si">}</span><span class="s2"> done | &quot;</span> <span class="sa">f</span><span class="s2">&quot;Iter time: </span><span class="si">{</span><span class="n">iter_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s | &quot;</span> <span class="sa">f</span><span class="s2">&quot;Total: </span><span class="si">{</span><span class="n">total_elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s | &quot;</span> <span class="sa">f</span><span class="s2">&quot;ETA: </span><span class="si">{</span><span class="n">remaining</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">check_stop</span><span class="p">():</span>
+                            <span class="k">raise</span> <span class="ne">InterruptedError</span><span class="p">(</span><span class="s2">&quot;Action was cancelled by the user.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patch </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_patches</span><span class="si">}</span><span class="s2"> done | &quot;</span> <span class="sa">f</span><span class="s2">&quot;Iter time: </span><span class="si">{</span><span class="n">iter_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s | &quot;</span> <span class="sa">f</span><span class="s2">&quot;Total: </span><span class="si">{</span><span class="n">total_elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s | &quot;</span> <span class="sa">f</span><span class="s2">&quot;ETA: </span><span class="si">{</span><span class="n">remaining</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+                    <span class="n">last_time</span> <span class="o">=</span> <span class="n">now</span>
+        
+        <span class="n">output</span> <span class="o">/=</span> <span class="n">normalization_map</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yann Kerverdo, Florent Leray, Youwan Mahé.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

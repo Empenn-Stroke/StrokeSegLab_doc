@@ -1,0 +1,37 @@
+StrokeSegLab.managers package
+=============================
+
+Submodules
+----------
+
+StrokeSegLab.managers.config\_manager module
+--------------------------------------------
+
+.. automodule:: StrokeSegLab.managers.config_manager
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.managers.option\_manager module
+--------------------------------------------
+
+.. automodule:: StrokeSegLab.managers.option_manager
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.managers.singleton module
+--------------------------------------
+
+.. automodule:: StrokeSegLab.managers.singleton
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.managers
+   :members:
+   :show-inheritance:
+   :undoc-members:

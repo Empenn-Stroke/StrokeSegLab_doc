@@ -1,0 +1,43 @@
+StrokeSegLab package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   StrokeSegLab.entrypoints
+   StrokeSegLab.inference
+   StrokeSegLab.logger
+   StrokeSegLab.managers
+   StrokeSegLab.postprocessing
+   StrokeSegLab.preprocessing
+   StrokeSegLab.utils
+
+Submodules
+----------
+
+StrokeSegLab.convertor\_fp16 module
+-----------------------------------
+
+.. automodule:: StrokeSegLab.convertor_fp16
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.stroke\_seg module
+-------------------------------
+
+.. automodule:: StrokeSegLab.stroke_seg
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab
+   :members:
+   :show-inheritance:
+   :undoc-members:

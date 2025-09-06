@@ -1,0 +1,69 @@
+StrokeSegLab.utils package
+==========================
+
+Submodules
+----------
+
+StrokeSegLab.utils.logger module
+--------------------------------
+
+.. automodule:: StrokeSegLab.utils.logger
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.models\_manager module
+-----------------------------------------
+
+.. automodule:: StrokeSegLab.utils.models_manager
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.naming module
+--------------------------------
+
+.. automodule:: StrokeSegLab.utils.naming
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.path module
+------------------------------
+
+.. automodule:: StrokeSegLab.utils.path
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.processing\_utils module
+-------------------------------------------
+
+.. automodule:: StrokeSegLab.utils.processing_utils
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.string module
+--------------------------------
+
+.. automodule:: StrokeSegLab.utils.string
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+StrokeSegLab.utils.wrapper module
+---------------------------------
+
+.. automodule:: StrokeSegLab.utils.wrapper
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:

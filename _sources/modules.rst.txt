@@ -1,0 +1,7 @@
+StrokeSegLab
+============
+
+.. toctree::
+   :maxdepth: 4
+
+   StrokeSegLab
