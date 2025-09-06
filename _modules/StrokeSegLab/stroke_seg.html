@@ -1,0 +1,215 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrokeSegLab.stroke_seg &mdash; StrokeSeg 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            StrokeSeg
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../StrokeSegLab.html">StrokeSegLab package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">StrokeSeg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">StrokeSegLab.stroke_seg</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for StrokeSegLab.stroke_seg</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">entrypoints.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">CLIMain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">entrypoints.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">GUIMain</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+
+<div class="viewcode-block" id="restricted_float">
+<a class="viewcode-back" href="../../StrokeSegLab.html#StrokeSegLab.stroke_seg.restricted_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">restricted_float</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the input to a float and checks if it is between 0.0 and 1.0 (inclusive)</span>
+<span class="sd">    This function is meant to be used with argparse to validate command-line arguments</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (str): The input value to convert and check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The valid float value between 0.0 and 1.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is not a valid float&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> is out of range: must be between 0 and 1&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="parse_args">
+<a class="viewcode-back" href="../../StrokeSegLab.html#StrokeSegLab.stroke_seg.parse_args">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">(</span><span class="n">gui</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse command-line arguments for the segmentation application</span>
+<span class="sd">    - You must specify either --input or --import-model (not both)</span>
+<span class="sd">    - If --import-model is used, no other option must be set</span>
+<span class="sd">    - If --only-preprocessing is used, no other option must be set</span>
+<span class="sd">    Args:</span>
+<span class="sd">        gui (bool): True if no arguments were given to the script, meaning it runs in GUI mode.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        argparse.Namespace: Parsed command-line arguments as attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Run segmentation pipeline&quot;</span><span class="p">,</span> <span class="n">epilog</span><span class="o">=</span><span class="s2">&quot;If no arguments are provided, the graphical interface will be launched by default&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--input&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Input image(s) path&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--model&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model name (optional)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--suffix&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;output name suffix (optional)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-V&quot;</span><span class="p">,</span> <span class="s2">&quot;--viewer&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span><span class="n">const</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify a viewer name, or use default if none is given&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--only-preproc&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run only the preprocessing step and stop&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--save-preproc&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save all the preprocessing steps&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--keep-mni&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save the input and output images registered to the MNI space&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--threshold&quot;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="n">restricted_float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Threshold (optional)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--pmap&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save probability map&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--import-model&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s2">&quot;__SHOW_MODELS__&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model path to add to usable models (try it with &#39;-m&#39;, &#39;--model&#39; before). If called without value, list all models.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--gui&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Open the GUI application&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable verbose mode (set logging level to DEBUG instead of INFO).&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">gui</span> <span class="ow">or</span> <span class="n">gui</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span> <span class="p">:</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You can&#39;t open the GUI in import model mode&quot;</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">input</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span><span class="p">):</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;You must specify either --input or --import-model&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">keep_mni</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">pmap</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">only_preproc</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">viewer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">save_preproc</span><span class="p">):</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;When --import-model is used, no other options must be set!&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">only_preproc</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">keep_mni</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">pmap</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">viewer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">save_preproc</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;When --only-preprocessing is used, no other options must be set!&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+    <span class="n">gui</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">(</span><span class="n">gui</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gui</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">gui</span><span class="p">:</span> <span class="c1"># No command-line arguments or gui argument provided: launch the graphical interface</span>
+        <span class="n">setup_logger</span><span class="p">(</span><span class="n">cli</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">GUIMain</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                <span class="n">only_preprocessing</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">only_preproc</span><span class="p">,</span>
+                <span class="n">keep_MNI</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">keep_mni</span><span class="p">,</span>
+                <span class="n">save_pmap</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pmap</span><span class="p">,</span>
+                <span class="n">model_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+                <span class="n">viewer</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span>
+                <span class="n">save_preprocessing</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">save_preproc</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Initialize the CLI application with parsed arguments</span>
+        <span class="n">setup_logger</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">CLIMain</span><span class="p">(</span>
+            <span class="n">input_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+            <span class="n">only_preprocessing</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">only_preproc</span><span class="p">,</span>
+            <span class="n">keep_MNI</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">keep_mni</span><span class="p">,</span>
+            <span class="n">save_pmap</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pmap</span><span class="p">,</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+            <span class="n">viewer</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span>
+            <span class="n">import_model</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span><span class="p">,</span>
+            <span class="n">save_preprocessing</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">save_preproc</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> <span class="c1"># Prediction or brain extraction mode</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">import_model</span> <span class="o">==</span> <span class="s2">&quot;__SHOW_MODELS__&quot;</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">show_models</span><span class="p">()</span> <span class="c1"># Show model mode</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">import_model</span><span class="p">()</span> <span class="c1"># Import model mode</span>
+                
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yann Kerverdo, Florent Leray, Youwan Mahé.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

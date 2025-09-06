@@ -1,0 +1,21 @@
+StrokeSegLab.inference package
+==============================
+
+Submodules
+----------
+
+StrokeSegLab.inference.inference module
+---------------------------------------
+
+.. automodule:: StrokeSegLab.inference.inference
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.inference
+   :members:
+   :show-inheritance:
+   :undoc-members:

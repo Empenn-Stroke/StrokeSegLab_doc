@@ -1,0 +1,12 @@
+StrokeSeg Documentation
+=======================
+
+.. note::
+
+   ⚠ This application is for research purposes only!
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+
+   StrokeSegLab

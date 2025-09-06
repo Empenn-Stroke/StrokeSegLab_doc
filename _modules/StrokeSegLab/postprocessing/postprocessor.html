@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrokeSegLab.postprocessing.postprocessor &mdash; StrokeSeg 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            StrokeSeg
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../StrokeSegLab.html">StrokeSegLab package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">StrokeSeg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">StrokeSegLab.postprocessing.postprocessor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for StrokeSegLab.postprocessing.postprocessor</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">nibabel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">expit</span><span class="p">,</span> <span class="n">softmax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.config_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.naming</span><span class="w"> </span><span class="kn">import</span> <span class="n">BET</span><span class="p">,</span> <span class="n">DERIVATIVES</span><span class="p">,</span> <span class="n">EXTENSIONS</span><span class="p">,</span> <span class="n">MNI</span><span class="p">,</span> <span class="n">PMAP</span><span class="p">,</span> <span class="n">RAWDATA</span><span class="p">,</span> <span class="n">T1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">managers.option_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Option</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">postprocessing.viewer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Viewer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">preprocessing.resampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnimaWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.processing_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_image_basename</span><span class="p">,</span> <span class="n">move_to_output</span><span class="p">,</span> <span class="n">rm_entity</span>
+
+<div class="viewcode-block" id="Postprocessor">
+<a class="viewcode-back" href="../../../StrokeSegLab.postprocessing.html#StrokeSegLab.postprocessing.postprocessor.Postprocessor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Postprocessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class performs postprocessing on 3D images</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gui</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the main postprocessing class with optional GUI integration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gui (GUIMain, optional): Instance of the gui class to enable the display of messages and status updates. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option</span> <span class="o">=</span> <span class="n">Option</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper</span> <span class="o">=</span> <span class="n">AnimaWrapper</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resampler</span> <span class="o">=</span> <span class="n">Resampler</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">=</span> <span class="n">gui</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">temp_dir</span> <span class="p">:</span><span class="nb">str</span> <span class="p">,</span><span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span><span class="n">base_name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">affine</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save a NIFTI image with a dynamically constructed name</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            temp_dir (str): Directory where the image will be save</span>
+<span class="sd">            data (np.ndarray): Data of the image </span>
+<span class="sd">            base_name (str): Basename of the image, without extension</span>
+<span class="sd">            affine (np.ndarray): Affine transformation matrix of the image</span>
+<span class="sd">            name (str): Identifier to determine filename suffix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Full path of the saved file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out_img</span> <span class="o">=</span> <span class="n">nibabel</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">affine</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span><span class="s2">&quot;pmap&quot;</span><span class="p">:</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">base_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">PMAP</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span><span class="s2">&quot;suffix&quot;</span><span class="p">)</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">base_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">)</span>
+        <span class="n">nibabel</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_img</span><span class="p">,</span> <span class="n">output_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output_file</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_to_segmentation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the output of the model into a segmentation based on the threshold given : </span>
+<span class="sd">        - Take the first element of the batch axis</span>
+<span class="sd">        - Apply a softmax on the channel dimensions (2 channels : background and lesion)</span>
+<span class="sd">        - Exctract the probabilities of the lesion class (1)</span>
+<span class="sd">        - Save it if the option &#39;pmap&#39; is specified</span>
+<span class="sd">        - Apply a threshold to create a binary mask</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (np.ndarray): Model output with shape (batch_size, channels, x, y, z)</span>
+<span class="sd">            threshold (float): Threshold to create the binary mask</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[np.ndarray,np.ndarray]: seg : binary mask, pmap : probability map if requested</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># data = data[1]</span>
+        <span class="c1"># data = expit(data)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;save_pmap&quot;</span><span class="p">):</span>
+            <span class="n">pmap</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pmap</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">seg</span><span class="p">,</span><span class="n">pmap</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_to_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">img_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">trsf_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">ref</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register an image to a reference using anima executable and a wrapper</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            img_path (str): Image path</span>
+<span class="sd">            trsf_path (str): Path to the transformation text file, produced during the preprocessing</span>
+<span class="sd">            ref (str): Reference image path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xml_path</span> <span class="o">=</span> <span class="n">trsf_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">,</span><span class="s1">&#39;.xml&#39;</span><span class="p">)</span>
+        <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;animaTransformSerieXmlGenerator&quot;</span><span class="p">,</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span><span class="n">trsf_path</span><span class="p">,</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span><span class="n">xml_path</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;animaApplyTransformSerie&quot;</span><span class="p">,</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span><span class="n">img_path</span><span class="p">,</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span><span class="n">xml_path</span><span class="p">,</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span><span class="n">img_path</span><span class="p">,</span><span class="s2">&quot;-g&quot;</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="s2">&quot;-I&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">action_name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Log the current action</span>
+<span class="sd">        Args:</span>
+<span class="sd">            action_name (str): Name of the action</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting </span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gui</span> <span class="o">!=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Postprocessing : Starting </span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">padding</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove padding from a numpy array based on a list of tuples specifying the intervals to keep for each dimension</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (np.ndarray): Data numpy array to process</span>
+<span class="sd">            padding (list[tuple[int, int]]): List of tuples that specify the padding to remove (start, end)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Array with padding removed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dim_pad</span> <span class="ow">in</span> <span class="n">padding</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">dim_pad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="n">dim_pad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">dim_pad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slices</span><span class="p">)]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_uncrop_from_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">slicer</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span><span class="nb">slice</span><span class="p">,</span><span class="nb">slice</span><span class="p">],</span><span class="n">original_shape</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">])</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Place the cropped data back into a full-size volume at the location specified by slicer. Then transpose the volume axes from (x, y, z) to (z, y, x)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (np.ndarray): Cropped data</span>
+<span class="sd">            slicer (tuple[slice,slice,slice]): Tuple of slices that specify where to place data</span>
+<span class="sd">            original_shape (tuple[int,int,int]): Shape of full original volume</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Uncropped data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">original_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">full_volume</span><span class="p">[</span><span class="n">slicer</span><span class="p">]</span><span class="o">=</span><span class="n">data</span>
+        <span class="n">full_volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">full_volume</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">full_volume</span>
+    
+<div class="viewcode-block" id="Postprocessor.check_viewer">
+<a class="viewcode-back" href="../../../StrokeSegLab.postprocessing.html#StrokeSegLab.postprocessing.postprocessor.Postprocessor.check_viewer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_viewer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewer</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call for check_viewer method from the viewer class to check if the viewer specify exist</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            viewer (str): Name of the viewer specify</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">check_viewer</span><span class="p">(</span><span class="n">viewer</span><span class="p">)</span></div>
+
+
+
+    
+<div class="viewcode-block" id="Postprocessor.run">
+<a class="viewcode-back" href="../../../StrokeSegLab.postprocessing.html#StrokeSegLab.postprocessing.postprocessor.Postprocessor.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span><span class="n">affine</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span><span class="n">input_path</span> <span class="p">:</span> <span class="nb">str</span> <span class="p">,</span><span class="n">bbox</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="p">,</span><span class="n">original_shape</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">],</span><span class="n">temp_dir</span> <span class="p">:</span> <span class="nb">str</span> <span class="p">,</span><span class="n">trsf_path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">old_spacing</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">],</span><span class="n">padding</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span><span class="n">bet</span> <span class="p">:</span> <span class="nb">str</span> <span class="p">,</span><span class="n">MNI_base_image</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">threshold</span> <span class="p">:</span> <span class="nb">float</span> <span class="p">,</span><span class="n">open_viewer</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the entire postprocessing pipeline on the data produced by the inference step : </span>
+<span class="sd">        - Convert to segmentation, return a pmap if the option is specified by the user</span>
+<span class="sd">        - Remove padding</span>
+<span class="sd">        - Uncrop</span>
+<span class="sd">        - Resampling to the original spacing</span>
+<span class="sd">        - Saving image</span>
+<span class="sd">        - Register to reference only if the inverse transformation was applied during preprocessing</span>
+<span class="sd">        - Open viewer with input image and binary mask if the option was specified by the user</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (np.ndarray): Data prostprocessed</span>
+<span class="sd">            affine (np.ndarray): affine matrix</span>
+<span class="sd">            input_path (str): Input path</span>
+<span class="sd">            bbox (list[tuple[int, int]]): Bounding box coordinates used for cropping</span>
+<span class="sd">            original_shape (tuple[int,int,int]): Original shape of the image before preprocessing</span>
+<span class="sd">            temp_dir (str): Path to the temporary directory</span>
+<span class="sd">            trsf_path (str): Path to the transformation text file</span>
+<span class="sd">            old_spacing (tuple[float,float,float]): Voxel spacing of the input image</span>
+<span class="sd">            padding (list[tuple[int, int]]): List of padding tuples applied to each dimension</span>
+<span class="sd">            bet (str): Path to the brain-extracted T1 image</span>
+<span class="sd">            MNI_base_image (str): Reference MNI image array or None</span>
+<span class="sd">            threshold (float): Segmentation threshold value</span>
+<span class="sd">            open_viewer (bool, optional): If True open a viewer with input image and segmentation. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;convert to segmentation&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+        <span class="n">seg</span><span class="p">,</span><span class="n">pmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_segmentation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">threshold</span><span class="p">)</span>
+
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;seg&quot;</span><span class="p">,</span><span class="n">seg</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">pmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;pmap&quot;</span><span class="p">,</span><span class="n">pmap</span><span class="p">))</span>
+        <span class="c1"># List of (name, array) tuples used to postprocess both binary mask and probability map differently depending on their type</span>
+        
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+
+            <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;remove padding&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_padding</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="n">padding</span><span class="p">)</span>
+
+            <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;uncrop&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+            <span class="n">slicer</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">bbox</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uncrop_from_bbox</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="n">slicer</span><span class="p">,</span><span class="n">original_shape</span><span class="p">)</span>
+
+            <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;resampling&quot;</span>
+            <span class="n">new_spacing</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resampler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="n">new_spacing</span><span class="p">,</span><span class="n">old_spacing</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">basename</span> <span class="o">=</span> <span class="n">rm_entity</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span><span class="n">BET</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;flair&quot;</span><span class="p">):</span>
+                <span class="n">basename</span> <span class="o">=</span> <span class="n">rm_entity</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span><span class="n">T1</span><span class="p">)</span>
+
+            <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;saving image to nii&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+            <span class="n">nii_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_img</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span><span class="n">output</span><span class="p">,</span><span class="n">basename</span><span class="p">,</span><span class="n">affine</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">trsf_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_MNI&quot;</span><span class="p">):</span>
+                <span class="n">new_output</span> <span class="o">=</span> <span class="n">get_image_basename</span><span class="p">(</span><span class="n">nii_file</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">MNI</span> <span class="o">+</span> <span class="s2">&quot;.nii.gz&quot;</span>
+                <span class="n">new_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">nii_file</span><span class="p">),</span><span class="n">new_output</span><span class="p">)</span>
+                <span class="n">nii_file</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">nii_file</span><span class="p">,</span><span class="n">new_output</span><span class="p">)</span>
+                <span class="n">input_path</span> <span class="o">=</span> <span class="n">MNI_base_image</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;register to reference&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_register_to_reference</span><span class="p">(</span><span class="n">nii_file</span><span class="p">,</span><span class="n">trsf_path</span><span class="p">,</span><span class="n">bet</span><span class="p">)</span>
+
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">move_to_output</span><span class="p">(</span><span class="n">nii_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">open_viewer</span> <span class="ow">and</span> <span class="n">name</span><span class="o">==</span><span class="s2">&quot;seg&quot;</span><span class="p">:</span>
+                <span class="n">action_name</span><span class="o">=</span><span class="s2">&quot;open viewer&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print_action</span><span class="p">(</span><span class="n">action_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span><span class="n">output_path</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yann Kerverdo, Florent Leray, Youwan Mahé.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

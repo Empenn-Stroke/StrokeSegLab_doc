@@ -1,0 +1,10 @@
+StrokeSegLab.logger package
+===========================
+
+Module contents
+---------------
+
+.. automodule:: StrokeSegLab.logger
+   :members:
+   :show-inheritance:
+   :undoc-members:
