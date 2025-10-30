@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>StrokeSegLab: StrokeSeg: Automated Stroke Segmentation Application</title>
+<title>StrokeSegLab: postprocessing Directory Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -56,8 +56,6 @@ $(function() {
 /* @license-end */
 </script>
 <div id="main-nav"></div>
-</div><!-- top -->
-<div id="doc-content">
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
 $(function(){ initResizable(false); });
@@ -84,41 +82,16 @@ $(function(){ initResizable(false); });
 </div>
 </div>
 
-<div><div class="header">
-  <div class="headertitle"><div class="title">StrokeSeg: Automated Stroke Segmentation Application </div></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_e4f1ce5319e85c7908e8df0e328b8d80.html">postprocessing</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">postprocessing Directory Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_INDEX"></a></p>
-<h1><a class="anchor" id="autotoc_md22"></a>
-⚠️ This tool is for research purpose only!</h1>
-<h1><a class="anchor" id="autotoc_md23"></a>
-StrokeSeg: Automated Stroke Segmentation Application</h1>
-<p>StrokeSeg is a Python application designed to automate the segmentation of stroke lesions from medical imaging data. It provides a complete workflow including preprocessing, inference using trained models, and postprocessing with visualization tools. The modular architecture allows for easy customization and extension.</p>
-<h2><a class="anchor" id="autotoc_md24"></a>
-Application Architecture Overview</h2>
-<p>The project is organized into several key modules, each responsible for a specific aspect of the stroke segmentation workflow:</p>
-<ul>
-<li><b>entrypoints/</b>: Contains the main entry points for the application, including CLI and GUI interfaces.</li>
-<li><b>preprocessing/</b>: Handles data preparation tasks such as brain extraction, resampling, and general preprocessing utilities (preprocessor.py, utils.py).</li>
-<li><b>inference/</b>: Manages the inference process, applying trained models to input data for stroke segmentation (inference.py)).</li>
-<li><b>postprocessing/</b>: Includes postprocessing steps (postprocessor.py) and visualization tools (viewer.py) to refine and display segmentation results.</li>
-<li><b>managers/</b>: Provides configuration (config_manager.py) and option management (option_manager.py), as well as singleton patterns (singleton.py) for shared resources.</li>
-<li><b>logger/</b>: Implements logging functionality (logger.py](./logger/logger.py)) to track application events and errors.</li>
-<li><b>utils/</b>: Offers various utility functions for model management, file naming, path handling, string operations./utils/string.py, and more.</li>
-<li><b>assets/</b>: Stores static assets such as images used in the application</li>
-<li><b>logs/</b>: Contains log files generated during application runs.</li>
-</ul>
-<p>Each module is designed to be modular and maintainable, facilitating easy updates and extensions to the application's functionality.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
-User Guide</h2>
-<p>For detailed usage instructions, please refer to the USER_GUIDE.md file.</p>
-<h2><a class="anchor" id="autotoc_md26"></a>
-Setup Instructions</h2>
-<p>To set up the application, simply run the provided setup script:</p>
-<div class="fragment"><div class="line">./setup.sh</div>
-</div><!-- fragment --><p>You do not need to manually clone the repository; the <code>setup.sh</code> script will handle cloning automatically. If you have already cloned the repository, make sure it is located in a parent directory named <code>StrokeSeg.sh</code>, and execute <code>setup.sh</code> from the parent of <code>StrokeSeg.sh</code>. The script will update the repository and install all necessary dependencies for you. </p>
-</div></div><!-- PageDoc -->
-<a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

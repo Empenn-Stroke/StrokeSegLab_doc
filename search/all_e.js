@@ -1,0 +1,12 @@
+var searchData=
+[
+  ['save_0',['save',['../classconfig__manager_1_1Config.html#a7928e740af5c6ca4ac2a89c5762a6989',1,'config_manager::Config']]],
+  ['segmentation_20application_1',['Segmentation Application',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md2',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html#autotoc_md23',1,'StrokeSeg: Automated Stroke Segmentation Application']]],
+  ['set_2',['set',['../classconfig__manager_1_1Config.html#a6d7bb8d31e9f54d80b8179a85f02e599',1,'config_manager.Config.set()'],['../classoption__manager_1_1Option.html#a92ff4a3349e45e19b470e245df9e9c5b',1,'option_manager.Option.set()']]],
+  ['setup_20instructions_3',['Setup Instructions',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md5',1,'Setup Instructions'],['../index.html#autotoc_md26',1,'Setup Instructions']]],
+  ['show_5fmodels_4',['show_models',['../classStrokeSegLab_1_1entrypoints_1_1cli_1_1CLIMain.html#a8f7933b042489194364347ba2ce1ca45',1,'StrokeSegLab::entrypoints::cli::CLIMain']]],
+  ['singletonmeta_5',['SingletonMeta',['../classsingleton_1_1SingletonMeta.html',1,'singleton']]],
+  ['stroke_20segmentation_20application_6',['Stroke Segmentation Application',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md2',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html#autotoc_md23',1,'StrokeSeg: Automated Stroke Segmentation Application']]],
+  ['strokeseg_3a_20automated_20stroke_20segmentation_20application_7',['StrokeSeg: Automated Stroke Segmentation Application',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md2',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html#autotoc_md23',1,'StrokeSeg: Automated Stroke Segmentation Application']]],
+  ['strokeseglab_8',['StrokeSegLab',['../namespaceStrokeSegLab.html',1,'']]]
+];

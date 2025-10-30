@@ -1,0 +1,11 @@
+var searchData=
+[
+  ['and_20logs_0',['Monitoring and Logs',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2USER__GUIDE.html#autotoc_md20',1,'']]],
+  ['and_20monitoring_1',['Running and Monitoring',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2USER__GUIDE.html#autotoc_md14',1,'']]],
+  ['and_20output_20management_2',['Input and Output Management',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2USER__GUIDE.html#autotoc_md11',1,'']]],
+  ['animawrapper_3',['AnimaWrapper',['../classStrokeSegLab_1_1utils_1_1wrapper_1_1AnimaWrapper.html',1,'StrokeSegLab::utils::wrapper']]],
+  ['application_4',['Application',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2USER__GUIDE.html#autotoc_md9',1,'Launching the Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md2',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html#autotoc_md23',1,'StrokeSeg: Automated Stroke Segmentation Application']]],
+  ['application_20architecture_20overview_5',['Application Architecture Overview',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md3',1,'Application Architecture Overview'],['../index.html#autotoc_md24',1,'Application Architecture Overview']]],
+  ['architecture_20overview_6',['Architecture Overview',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md3',1,'Application Architecture Overview'],['../index.html#autotoc_md24',1,'Application Architecture Overview']]],
+  ['automated_20stroke_20segmentation_20application_7',['Automated Stroke Segmentation Application',['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../md__2home_2ymahe_2Desktop_2StrokeSeg_2StrokeSegLab_2README.html#autotoc_md2',1,'StrokeSeg: Automated Stroke Segmentation Application'],['../index.html#autotoc_md23',1,'StrokeSeg: Automated Stroke Segmentation Application']]]
+];
