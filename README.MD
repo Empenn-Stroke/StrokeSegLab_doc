@@ -15,7 +15,9 @@ pip install pdoc
 
 From the parent directory of the project (the one that contains the StrokeSegLab/ folder):
 
+```bash
 PYTHONPATH=StrokeSegLab pdoc -o docs StrokeSegLab
+```
 
 This command
 
