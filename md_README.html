@@ -56,8 +56,6 @@ $(function() {
 /* @license-end */
 </script>
 <div id="main-nav"></div>
-</div><!-- top -->
-<div id="doc-content">
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
 $(function(){ initResizable(false); });
@@ -84,42 +82,43 @@ $(function(){ initResizable(false); });
 </div>
 </div>
 
+</div><!-- top -->
+<div id="doc-content">
 <div><div class="header">
-  <div class="headertitle"><div class="title">StrokeSeg: Automated Stroke Segmentation Application </div></div>
+  <div class="headertitle"><div class="title">StrokeSeg: Automated Stroke Segmentation Application</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_INDEX"></a></p>
-<h1><a class="anchor" id="autotoc_md22"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md0"></a></p>
+<h1><a class="anchor" id="autotoc_md1"></a>
 ⚠️ This tool is for research purpose only!</h1>
-<h1><a class="anchor" id="autotoc_md23"></a>
+<h1><a class="anchor" id="autotoc_md2"></a>
 StrokeSeg: Automated Stroke Segmentation Application</h1>
 <p>StrokeSeg is a Python application designed to automate the segmentation of stroke lesions from medical imaging data. It provides a complete workflow including preprocessing, inference using trained models, and postprocessing with visualization tools. The modular architecture allows for easy customization and extension.</p>
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md3"></a>
 Application Architecture Overview</h2>
 <p>The project is organized into several key modules, each responsible for a specific aspect of the stroke segmentation workflow:</p>
 <ul>
-<li><b>entrypoints/</b>: Contains the main entry points for the application, including CLI and GUI interfaces.</li>
-<li><b>preprocessing/</b>: Handles data preparation tasks such as brain extraction, resampling, and general preprocessing utilities (preprocessor.py, utils.py).</li>
-<li><b>inference/</b>: Manages the inference process, applying trained models to input data for stroke segmentation (inference.py)).</li>
-<li><b>postprocessing/</b>: Includes postprocessing steps (postprocessor.py) and visualization tools (viewer.py) to refine and display segmentation results.</li>
-<li><b>managers/</b>: Provides configuration (config_manager.py) and option management (option_manager.py), as well as singleton patterns (singleton.py) for shared resources.</li>
-<li><b>logger/</b>: Implements logging functionality (logger.py](./logger/logger.py)) to track application events and errors.</li>
-<li><b>utils/</b>: Offers various utility functions for model management, file naming, path handling, string operations./utils/string.py, and more.</li>
-<li><b>assets/</b>: Stores static assets such as images used in the application</li>
-<li><b>logs/</b>: Contains log files generated during application runs.</li>
+<li><a href="./entrypoints"><b>entrypoints/</b></a>: Contains the main entry points for the application, including <a href="./entrypoints/cli.py">CLI</a> and <a href="./entrypoints/gui.py">GUI</a> interfaces.</li>
+<li><a href="./preprocessing"><b>preprocessing/</b></a>: Handles data preparation tasks such as <a href="./preprocessing/brain_extraction.py">brain extraction</a>, <a href="./preprocessing/resampling.py">resampling</a>, and general preprocessing utilities (<a href="./preprocessing/preprocessor.py">preprocessor.py</a>, <a href="./preprocessing/utils.py">utils.py</a>).</li>
+<li><a href="./inference"><b>inference/</b></a>: Manages the inference process, applying trained models to input data for stroke segmentation (<a href="./inference/inference.py">inference.py</a>).</li>
+<li><a href="./postprocessing"><b>postprocessing/</b></a>: Includes postprocessing steps (<a href="./postprocessing/postprocessor.py">postprocessor.py</a>) and visualization tools (<a href="./postprocessing/viewer.py">viewer.py</a>) to refine and display segmentation results.</li>
+<li><a href="./managers"><b>managers/</b></a>: Provides configuration (<a href="./managers/config_manager.py">config_manager.py</a>) and option management (<a href="./managers/option_manager.py">option_manager.py</a>), as well as singleton patterns (<a href="./managers/singleton.py">singleton.py</a>) for shared resources.</li>
+<li><a href="./logger"><b>logger/</b></a>: Implements logging functionality (<a href="./logger/logger.py">logger.py</a>) to track application events and errors.</li>
+<li><a href="./utils"><b>utils/</b></a>: Offers various utility functions for <a href="./utils/models_manager.py">model management</a>, <a href="./utils/naming.py">file naming</a>, <a href="./utils/path.py">path handling</a>, <a href="./utils/string.py">string operations</a>, and more.</li>
+<li><a href="./assets"><b>assets/</b></a>: Stores static assets such as images used in the application</li>
+<li><a href="./logs"><b>logs/</b></a>: Contains log files generated during application runs.</li>
 </ul>
 <p>Each module is designed to be modular and maintainable, facilitating easy updates and extensions to the application's functionality.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md4"></a>
 User Guide</h2>
-<p>For detailed usage instructions, please refer to the USER_GUIDE.md file.</p>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<p>For detailed usage instructions, please refer to the <a class="el" href="index.html#md_USER__GUIDE">USER_GUIDE.md</a> file.</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Setup Instructions</h2>
 <p>To set up the application, simply run the provided setup script:</p>
 <div class="fragment"><div class="line">./setup.sh</div>
-</div><!-- fragment --><p>You do not need to manually clone the repository; the <code>setup.sh</code> script will handle cloning automatically. If you have already cloned the repository, make sure it is located in a parent directory named <code>StrokeSeg.sh</code>, and execute <code>setup.sh</code> from the parent of <code>StrokeSeg.sh</code>. The script will update the repository and install all necessary dependencies for you. </p>
-</div></div><!-- PageDoc -->
-<a href="doxygen_crawl.html"></a>
-</div><!-- contents -->
+</div><!-- fragment --><p>You do not need to manually clone the repository; the <a href="./setup.sh"><code>setup.sh</code></a> script will handle cloning automatically. If you have already cloned the repository, make sure it is located in a parent directory named <code>StrokeSeg.sh</code>, and execute <a href="./setup.sh"><code>setup.sh</code></a> from the parent of <code>StrokeSeg.sh</code>. The script will update the repository and install all necessary dependencies for you. </p>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
